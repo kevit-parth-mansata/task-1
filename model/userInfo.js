@@ -33,7 +33,13 @@ var UserSchema = new mongoose.Schema({
         type: String,
         default: null
     },
-
+    phNumber:{
+        type: Number,
+        default: null
+    },
+    profilePhotoName:{
+        type: String,
+    },
     tokens: [{
         access: {
             type: String,
@@ -71,7 +77,7 @@ UserSchema.methods.removeToken = function (token) {
     })
 }
 
-UserSchema.statics.findByToken = function (token) {
+UserSchema.statics.findByToken = async function (token) {
     var User = this;
     var decoded;
     try {
@@ -80,10 +86,11 @@ UserSchema.statics.findByToken = function (token) {
         // return new Promise((resolve,reject)=>{
         //     reject();
         // });
+        console.log(e);
         return Promise.reject();
     }
-    return User.findOne({
-        '_id': decoded._id,
+    return await User.findOne({
+        
         'tokens.token': token,
         'tokens.access': 'auth'
     });
@@ -98,7 +105,16 @@ UserSchema.statics.findByName = function (name) {
 
     });
 }
+UserSchema.statics.findUserByToken = function (token) {
+    var User = this;
+    return User.findOne({token}).then((user) => {
+        if (!user) {
+            return Promise.reject();
+        }
+        return Promise.resolve(user)
 
+    });
+};
 UserSchema.statics.findByCredentials = function (email, password) {
     var User = this;
     return User.findOne({ email }).then((user) => {
@@ -108,6 +124,7 @@ UserSchema.statics.findByCredentials = function (email, password) {
         return new Promise((resolve, reject) => {
             bcrypt.compare(password, user.password, (err, res) => {
                 if (res) {
+                    
                     resolve(user);
                 } else {
                     reject();
