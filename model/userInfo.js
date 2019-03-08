@@ -5,7 +5,7 @@ const _ = require('lodash');
 const bcrypt = require('bcryptjs');
 
 var UserSchema = new mongoose.Schema({
-    name:{
+    name: {
         type: String,
         required: true,
         minlength: 4,
@@ -29,15 +29,15 @@ var UserSchema = new mongoose.Schema({
         trim: true,
 
     },
-    address:{
+    address: {
         type: String,
         default: null
     },
-    phNumber:{
+    phNumber: {
         type: Number,
         default: null
     },
-    profilePhotoName:{
+    profilePhotoName: {
         type: String,
     },
     tokens: [{
@@ -54,8 +54,13 @@ var UserSchema = new mongoose.Schema({
 
 UserSchema.methods.toJSON = function () {
     user = this;
+    var newObj = {
+        _id: user._id,
+        email: user.email
+    };
+    return newObj;
     var userObject = user.toObject();
-    
+
     return _.pick(userObject, ['_id', 'email']);
 }
 UserSchema.methods.generateAuthToken = function () {
@@ -72,7 +77,7 @@ UserSchema.methods.generateAuthToken = function () {
 UserSchema.methods.removeToken = function (token) {
     return User.updateOne({
         $pull: {
-            tokens: {token}
+            tokens: { token }
         }
     })
 }
@@ -90,14 +95,14 @@ UserSchema.statics.findByToken = async function (token) {
         return Promise.reject();
     }
     return await User.findOne({
-        
+
         'tokens.token': token,
         'tokens.access': 'auth'
     });
 };
 UserSchema.statics.findByName = function (name) {
     var User = this;
-    return User.findOne({name}).then((user) => {
+    return User.findOne({ name }).then((user) => {
         if (!user) {
             return Promise.reject();
         }
@@ -107,12 +112,13 @@ UserSchema.statics.findByName = function (name) {
 }
 UserSchema.statics.findUserByToken = function (token) {
     var User = this;
-    return User.findOne({token}).then((user) => {
+    return User.findOne({
+        'tokens.token': token
+    }).then((user) => {
         if (!user) {
             return Promise.reject();
         }
         return Promise.resolve(user)
-
     });
 };
 UserSchema.statics.findByCredentials = function (email, password) {
@@ -124,7 +130,7 @@ UserSchema.statics.findByCredentials = function (email, password) {
         return new Promise((resolve, reject) => {
             bcrypt.compare(password, user.password, (err, res) => {
                 if (res) {
-                    
+
                     resolve(user);
                 } else {
                     reject();
