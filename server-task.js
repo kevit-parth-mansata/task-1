@@ -5,22 +5,22 @@ var app = express();
 app.use(bodyParser.json());
     
 
-let postUser = require('./postUser');
+let postUser = require('./routes/postUser');
 app.use('/', postUser);
 
-let authenticateUser = require('./authenticateUser');
+let authenticateUser = require('./routes/authenticateUser');
 app.use('/', authenticateUser);
 
-let logoutUser = require('./logoutUser');
+let logoutUser = require('./routes/logoutUser');
 app.use('/', logoutUser);
 
-let postProfilePhoto = require('./postProfilePhoto');
+let postProfilePhoto = require('./routes/postProfilePhoto');
 app.use('/', postProfilePhoto);
 
-let getUser = require('./getUser');
+let getUser = require('./routes/getUser');
 app.use('/', getUser);
 
-let patchUser = require('./patch');
+let patchUser = require('./routes/patchUser');
 app.use('/', patchUser);
 
 module.exports=app;

@@ -9,6 +9,8 @@ var filename = multer({ filename: 'aaabbb' });
 const { mongoose } = require('./db/mongooseConnect');
 const { User } = require('./model/userInfo');
 const { authenticate } = require('./middleware/authenticate');
+app.use(bodyParser.json());
+const router = express.Router();
 
 router.patch('/users/:name', authenticate, (req, res) => {
     var name = req.params.name;
