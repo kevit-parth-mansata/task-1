@@ -75,27 +75,28 @@ UserSchema.methods.generateAuthToken = function () {
     });
 };
 UserSchema.methods.removeToken = function (token) {
-    return User.updateOne({
+    var user=this;
+    return user.update({
         $pull: {
             tokens: { token }
         }
     })
 }
 
-UserSchema.statics.findByToken = async function (token) {
+UserSchema.statics.findByToken = function (token) {
     var User = this;
     var decoded;
+    
     try {
         decoded = jwt.verify(token, 'abc123');
     } catch (e) {
         // return new Promise((resolve,reject)=>{
         //     reject();
         // });
-        console.log(e);
         return Promise.reject();
     }
-    return await User.findOne({
-
+    return User.findOne({
+        '_id':decoded._id,
         'tokens.token': token,
         'tokens.access': 'auth'
     });
@@ -130,7 +131,7 @@ UserSchema.statics.findByCredentials = function (email, password) {
         return new Promise((resolve, reject) => {
             bcrypt.compare(password, user.password, (err, res) => {
                 if (res) {
-
+                    
                     resolve(user);
                 } else {
                     reject();
